@@ -1,40 +1,36 @@
 from abc import *
 from tensorflow import keras
 from tensorflow.keras.layers import LSTM, Dense
+from typing import List, Optional
+from warnings import warn
 
 import Data
 
 
 class Model(metaclass=ABCMeta):
-    def __init__(self, epoch: int, learning_rate: float, data_set: Data):
-        self.epoch = epoch
-        self.learning_rate = learning_rate
+    def __init__(self, model: keras.Sequential, data_set: Data, epoch: int, learning_rate: float):
+        self.model: Optional[keras.Sequential] = model
+        self.data_set: Data = data_set
 
-        self.data_set = data_set
+        self.epoch: int = epoch
+        self.learning_rate: float = learning_rate
 
-        self.data_path = ''
-        self.save_path = ''
-
-    @abstractmethod
-    def build_model(self) -> keras.Sequential:
-        pass
+        self.data_path: str = ''
+        self.save_path: str = 'model'
 
     def save_model(self):
-        pass
+        self.model.save(self.save_path)
 
 
 class CategoricalLSTM(Model):
-    def __init__(self, epoch: int, learning_rate: float, data_set: Data, lstm_size: int):
-        super().__init__(epoch, learning_rate, data_set)
+    def __init__(self, data_set: Data, epoch: int, learning_rate: float, lstm_size: int):
         self.lstm_size = lstm_size
-
-    def build_model(self) -> keras.Sequential:
         m = keras.Sequential()
-        m.add(LSTM(self.lstm_size))
-        m.add(Dense(super().data_set.output_size, activation=keras.activations.softmax))
+        m.add(LSTM(lstm_size))
+        m.add(Dense(data_set.output_size, activation=keras.activations.softmax))
 
         m.compile(loss=keras.losses.CategoricalCrossentropy(),
                   optimizer=keras.optimizers.RMSprop(super().learning_rate),
                   metrics=['mse', 'accuracy'])
 
-        return m
+        super().__init__(m, data_set, epoch, learning_rate)

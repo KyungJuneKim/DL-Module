@@ -3,7 +3,7 @@ from abc import *
 from random import randrange
 from typing import List
 
-from util import separate_data_set
+from util import split_data_set
 
 
 class DataSet(metaclass=ABCMeta):
@@ -34,7 +34,7 @@ class DataSet(metaclass=ABCMeta):
                 x.append(self.single_x(factor))
                 y.append(self.single_y(factor))
 
-            train_ds_tmp, val_ds_tmp, test_ds_tmp = separate_data_set(x, y, ratio)
+            train_ds_tmp, val_ds_tmp, test_ds_tmp = split_data_set(x, y, ratio)
             x_train += train_ds_tmp[0]
             y_train += train_ds_tmp[1]
             x_val += val_ds_tmp[0]

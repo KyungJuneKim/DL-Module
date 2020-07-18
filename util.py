@@ -3,7 +3,7 @@ from typing import List
 from warnings import warn
 
 
-def separate_data_set(x: List, y: List, ratio: List[float] = None):
+def split_data_set(x: List, y: List, ratio: List[float] = None):
     if ratio is None:
         ratio = [0.5, 0.3]
     if len(x) != len(y):
@@ -14,12 +14,12 @@ def separate_data_set(x: List, y: List, ratio: List[float] = None):
         warn('Too little ratio')
 
     indices = np.multiply(np.cumsum(ratio), len(x)).astype(np.int32)
-    separated = [(x[:indices[0]], y[:indices[0]])]
+    split = [(x[:indices[0]], y[:indices[0]])]
     for i, j in zip(indices[:-1], indices[1:]):
-        separated.append((x[i:j], y[i:j]))
-    separated.append((x[indices[-1]:], y[indices[-1]:]))
+        split.append((x[i:j], y[i:j]))
+    split.append((x[indices[-1]:], y[indices[-1]:]))
 
-    return separated
+    return split
 
 
 # def print_data(x: List):

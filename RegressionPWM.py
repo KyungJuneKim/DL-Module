@@ -76,8 +76,8 @@ if __name__ == '__main__':
         validation_data=(data.x_val, data.y_val)
     )
 
-    loss, mse, accuracy = model.evaluate(data.x_test, data.y_test)
-    print(loss, mse, accuracy)
+    loss, mae = model.evaluate(data.x_test, data.y_test)
+    print(loss, mae)
 
     pred = model.predict(
         data.reshape_x(data.single_x(0.75))

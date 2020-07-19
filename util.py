@@ -1,11 +1,13 @@
+import matplotlib.pyplot as plt
 import numpy as np
+from tensorflow.keras.callbacks import History
 from typing import List
 from warnings import warn
 
 
 def split_data_set(x: List, y: List, ratio: List[float] = None):
-    if ratio is None:
-        ratio = [0.5, 0.3]
+    if not ratio:
+        raise ValueError('Invalid ratio value')
     if len(x) != len(y):
         raise AssertionError('dataset lists are not the same length')
     if np.sum(ratio) > 1:
@@ -20,6 +22,24 @@ def split_data_set(x: List, y: List, ratio: List[float] = None):
     split.append((x[indices[-1]:], y[indices[-1]:]))
 
     return split
+
+
+def plot_model(h: History, validation: bool = False, keys: List[str] = None):
+    if not keys:
+        keys = ['loss']
+    fig, axes = plt.subplots(nrows=1, ncols=len(keys), sharex='all', figsize=(15, 6))
+
+    for idx, key in enumerate(keys):
+        axes[idx].set_title('Model ' + key)
+        axes[idx].plot(h.history[key], label=key)
+        if validation:
+            axes[idx].plot(h.history['val_' + key], label='val_' + key)
+        axes[idx].set_xlabel('Epoch')
+        axes[idx].set_ylabel(key.capitalize())
+        axes[idx].legend()
+
+    plt.tight_layout()
+    plt.show()
 
 
 # def print_data(x: List):

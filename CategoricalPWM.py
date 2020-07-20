@@ -20,13 +20,14 @@ class CategoricalPWM(DataSet):
     def single_x(self, factor):
         data = []
         scaling = 1000
-        for i in range(self.period):
-            if i < factor * self.period:
-                data.append((800+randrange(200))/scaling)
-            else:
-                data.append(randrange(200)/scaling)
+        for i in range(self.cycle):
+            for j in range(self.period):
+                if j < factor * self.period:
+                    data.append((800+randrange(200))/scaling)
+                else:
+                    data.append(randrange(200)/scaling)
 
-        return data * self.cycle
+        return data
 
     def single_y(self, factor):
         return self.factors.index(factor)
@@ -66,7 +67,7 @@ if __name__ == '__main__':
         data_set=data,
         epoch=5,
         learning_rate=0.01,
-        lstm_size=200
+        lstm_size=50
     )
     model.build_model()
 

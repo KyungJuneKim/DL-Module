@@ -15,7 +15,8 @@ def split_data_set(x: List, y: List, ratio: List[float] = None):
     if any(r*len(x) < 1 for r in ratio):
         warn('Too little ratio')
 
-    indices = np.multiply(np.cumsum(ratio), len(x)).astype(np.int32)
+    error = int(np.around(np.log10(len(x)))) - 15
+    indices = np.around(np.multiply(np.cumsum(ratio), len(x)), -error).astype(np.int32)
     split = [(x[:indices[0]], y[:indices[0]])]
     for i, j in zip(indices[:-1], indices[1:]):
         split.append((x[i:j], y[i:j]))

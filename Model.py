@@ -2,7 +2,6 @@ from abc import *
 from tensorflow import keras
 from tensorflow.keras.layers import LSTM, Dense
 from typing import Optional
-from warnings import warn
 
 import DataSet
 
@@ -21,6 +20,20 @@ class Model(keras.Sequential, metaclass=ABCMeta):
     @abstractmethod
     def build_model(self):
         pass
+
+
+class CategoricalLSTM(Model):
+    def __init__(self, data_set: DataSet, epoch: int, learning_rate: float, lstm_size: int):
+        super().__init__(data_set, epoch, learning_rate)
+        self.lstm_size = lstm_size
+
+    def build_model(self):
+        self.add(LSTM(self.lstm_size))
+        self.add(Dense(self.data_set.output_size, activation=keras.activations.softmax))
+
+        self.compile(loss=keras.losses.CategoricalCrossentropy(),
+                     optimizer=keras.optimizers.RMSprop(self.learning_rate),
+                     metrics=['mse', 'accuracy'])
 
 
 class ModelInit(metaclass=ABCMeta):

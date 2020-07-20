@@ -5,11 +5,11 @@ from typing import List
 from warnings import warn
 
 
-def split_data_set(x: List, y: List, ratio: List[float] = None):
+def split_data_set(x: List, y: List, ratio: List[float]):
     if not ratio:
-        raise ValueError('Invalid ratio value')
+        raise AttributeError('Nothing in ratio')
     if len(x) != len(y):
-        raise AssertionError('dataset lists are not the same length')
+        raise AssertionError('lists, x and y, are not the same length')
     if np.sum(ratio) > 1:
         raise AssertionError('The sum of the ratios must not exceed 1')
     if any(r*len(x) < 1 for r in ratio):

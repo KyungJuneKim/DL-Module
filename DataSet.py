@@ -1,11 +1,22 @@
 import numpy as np
 from abc import *
-from typing import List, Tuple
+from enum import Enum
+from typing import List, Optional, Tuple
+from warnings import warn
 
 from util import split_data_set
 
 
 class DataSet(metaclass=ABCMeta):
+    class IO(Enum):
+        x = 0
+        y = 1
+
+    class Cat(Enum):
+        train = 0
+        val = 1
+        test = 2
+
     def __init__(self, factors: List, input_size, output_size):
         self.factors = factors
         self.input_size = input_size
@@ -13,29 +24,39 @@ class DataSet(metaclass=ABCMeta):
 
         self.data_sets: List[Tuple[np.ndarray, np.ndarray]] = []
 
-    @property
-    def x_train(self) -> np.ndarray:
-        return self.data_sets[0][0] if len(self.data_sets) > 0 else None
+    def __get_property(self, io: IO, cat: Cat) -> Optional[np.ndarray]:
+        if not self.data_sets:
+            raise RuntimeError('You must generate data set first. Use `data.generate(num, ratio)`')
+
+        if len(self.data_sets) > cat.value:
+            return self.data_sets[cat.value][io.value]
+        else:
+            warn('No ' + cat.name + ' data set. Check the `ratio` parameter of the `generate()` function')
+            return None
 
     @property
-    def y_train(self) -> np.ndarray:
-        return self.data_sets[0][1] if len(self.data_sets) > 0 else None
+    def x_train(self) -> Optional[np.ndarray]:
+        return self.__get_property(self.IO.x, self.Cat.train)
 
     @property
-    def x_val(self) -> np.ndarray:
-        return self.data_sets[1][0] if len(self.data_sets) > 1 else None
+    def y_train(self) -> Optional[np.ndarray]:
+        return self.__get_property(self.IO.y, self.Cat.train)
 
     @property
-    def y_val(self) -> np.ndarray:
-        return self.data_sets[1][1] if len(self.data_sets) > 1 else None
+    def x_val(self) -> Optional[np.ndarray]:
+        return self.__get_property(self.IO.x, self.Cat.val)
 
     @property
-    def x_test(self) -> np.ndarray:
-        return self.data_sets[2][0] if len(self.data_sets) > 2 else None
+    def y_val(self) -> Optional[np.ndarray]:
+        return self.__get_property(self.IO.y, self.Cat.val)
 
     @property
-    def y_test(self) -> np.ndarray:
-        return self.data_sets[2][1] if len(self.data_sets) > 2 else None
+    def x_test(self) -> Optional[np.ndarray]:
+        return self.__get_property(self.IO.x, self.Cat.test)
+
+    @property
+    def y_test(self) -> Optional[np.ndarray]:
+        return self.__get_property(self.IO.y, self.Cat.test)
 
     def generate(self, num: int, ratio: List[float]):
         if not ratio:
@@ -53,12 +74,12 @@ class DataSet(metaclass=ABCMeta):
 
             split_sets = split_data_set(x, y, ratio)
             for data_set, split_set in zip(data_sets, split_sets):
-                data_set[0] += split_set[0]
-                data_set[1] += split_set[1]
+                data_set[self.IO.x.value] += split_set[self.IO.x.value]
+                data_set[self.IO.y.value] += split_set[self.IO.y.value]
 
         for data_set in data_sets:
             self.data_sets.append(
-                (self.reshape_x(data_set[0]), self.reshape_y(data_set[1]))
+                (self.reshape_x(data_set[self.IO.x.value]), self.reshape_y(data_set[self.IO.y.value]))
             )
 
         return self

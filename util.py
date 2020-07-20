@@ -39,8 +39,11 @@ def plot_model(h: History, validation: bool = False, keys: List[str] = None):
         axes[idx].set_ylabel(key.capitalize())
         axes[idx].legend()
 
-    plt.tight_layout()
+    fig.tight_layout()
     plt.show()
 
 
-# def print_data(x: List):
+def print_data(x: List):
+    plt.plot(x)
+    plt.tight_layout()
+    plt.show()

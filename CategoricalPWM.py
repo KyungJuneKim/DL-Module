@@ -58,7 +58,7 @@ if __name__ == '__main__':
         ratio=[0., .25, .5, .75, 1.],
         period=20,
         cycle=5
-    ).make_data(
+    ).generate(
         num=100,
         ratio=[0.7, 0.2]
     )

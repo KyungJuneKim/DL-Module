@@ -37,10 +37,11 @@ class DataSet(metaclass=ABCMeta):
     def y_test(self) -> np.ndarray:
         return self.data_sets[2][1] if len(self.data_sets) > 2 else None
 
-    def make_data(self, num: int, ratio: List[float]):
+    def generate(self, num: int, ratio: List[float]):
         if not ratio:
-            raise ValueError('Invalid ratio value')
+            raise AttributeError('Nothing in ratio')
 
+        self.data_sets.clear()
         data_sets = [[[], []] for _ in range(len(ratio)+1)]
 
         for factor in self.factors:

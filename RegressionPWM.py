@@ -57,7 +57,7 @@ if __name__ == '__main__':
     data = RegressionPWM(
         period=20,
         cycle=5
-    ).make_data(
+    ).generate(
         num=50,
         ratio=[0.7, 0.2]
     )

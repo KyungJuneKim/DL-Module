@@ -25,25 +25,30 @@ def split_data_set(x: List, y: List, ratio: List[float]):
     return split
 
 
-def plot_model(h: History, validation: bool = False, keys: List[str] = None):
-    if not keys:
-        keys = ['loss']
+def plot_model(history: History):
+    if not history.history:
+        raise RuntimeError('You must fit model first. Use `model.fit(x, y)`')
+    keys = []
+    for key1 in history.history:
+        if key1[:4] == 'val_':
+            continue
+        for key2 in history.history:
+            if key2 == 'val_' + key1:
+                keys.append((key1, key2))
+                break
+        else:
+            keys.append(tuple(key1,))
+
     fig, axes = plt.subplots(nrows=1, ncols=len(keys), sharex='all', figsize=(15, 6))
 
-    for idx, key in enumerate(keys):
-        axes[idx].set_title('Model ' + key)
-        axes[idx].plot(h.history[key], label=key)
-        if validation:
-            axes[idx].plot(h.history['val_' + key], label='val_' + key)
-        axes[idx].set_xlabel('Epoch')
-        axes[idx].set_ylabel(key.capitalize())
-        axes[idx].legend()
+    for axis, key in zip(axes, keys):
+        axis.set_title('Model ' + key[0])
+        axis.plot(history.history[key[0]], label=key[0])
+        if len(key) is 2:
+            axis.plot(history.history[key[1]], label=key[1])
+        axis.set_xlabel('Epoch')
+        axis.set_ylabel(key[0].capitalize())
+        axis.legend()
 
     fig.tight_layout()
-    plt.show()
-
-
-def print_data(x: List):
-    plt.plot(x)
-    plt.tight_layout()
     plt.show()

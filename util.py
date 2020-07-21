@@ -7,11 +7,11 @@ from warnings import warn
 
 def split_data_set(x: List, y: List, ratio: List[float]):
     if not ratio:
-        raise AttributeError('Nothing in ratio')
+        raise AttributeError('Nothing in the `ratio`')
     if len(x) != len(y):
-        raise AssertionError('lists, x and y, are not the same length')
+        raise AssertionError('lists, `x` and `y`, are not the same length')
     if np.sum(ratio) > 1:
-        raise AssertionError('The sum of the ratios must not exceed 1')
+        raise AssertionError('The sum of the elements of the `ratio` must not exceed 1')
     if any(r*len(x) < 1 for r in ratio):
         warn('Too little ratio')
 

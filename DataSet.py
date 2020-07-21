@@ -62,7 +62,7 @@ class DataSet(metaclass=ABCMeta):
 
     def generate(self, num: int, ratio: List[float]):
         if not ratio:
-            raise AttributeError('Nothing in ratio')
+            raise AttributeError('Nothing in the `ratio`')
 
         self.data_sets.clear()
         data_sets = [[[], []] for _ in range(len(ratio)+1)]

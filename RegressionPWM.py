@@ -1,11 +1,11 @@
 import numpy as np
 from random import randrange
-from tensorflow import keras
+from tensorflow.keras import activations, losses, metrics, optimizers
+from tensorflow.keras import Sequential
 from tensorflow.keras.layers import LSTM, Dense
-from typing import List
+from typing import Any, List
 
 from DataSet import DataSet
-from Model import Model
 from util import plot_model
 
 
@@ -16,6 +16,9 @@ class RegressionPWM(DataSet):
         if ratio is None:
             ratio = np.arange(0., 1., 0.01).tolist()
         super().__init__(ratio, period * cycle, 1)
+
+    def _get_raw_data(self) -> Any:
+        return None
 
     def single_x(self, factor):
         data = []
@@ -39,18 +42,27 @@ class RegressionPWM(DataSet):
         return np.array(y, dtype=np.float32)
 
 
-class RegressionLSTM(Model):
-    def __init__(self, data_set: DataSet, epoch: int, learning_rate: float, lstm_size: int):
-        super().__init__(data_set, epoch, learning_rate)
+class RegressionLSTM(Sequential):
+    def __init__(
+            self,
+            epoch: int, batch_size: int,
+            learning_rate: float, lstm_size: int
+    ):
+        super(RegressionLSTM, self).__init__()
+        self.epoch: int = epoch
+        self.batch_size: int = batch_size
+        self.learning_rate: float = learning_rate
         self.lstm_size = lstm_size
 
-    def build_model(self):
-        self.add(LSTM(self.lstm_size))
-        self.add(Dense(self.data_set.output_size, activation=keras.activations.sigmoid))
-
-        self.compile(loss='mse',
-                     optimizer=keras.optimizers.Adam(self.learning_rate),
-                     metrics=['mae'])
+        self.add(LSTM(lstm_size))
+        self.add(Dense(1, activation=activations.sigmoid))
+        self.compile(
+            loss=losses.mean_squared_error(),
+            optimizer=optimizers.Adam(learning_rate),
+            metrics=[
+                metrics.mean_absolute_error
+            ]
+        )
 
 
 if __name__ == '__main__':
@@ -63,19 +75,20 @@ if __name__ == '__main__':
     )
 
     model = RegressionLSTM(
-        data_set=data,
         epoch=5,
+        batch_size=1,
         learning_rate=0.01,
         lstm_size=50
     )
-    model.build_model()
 
     history = model.fit(
         data.x_train, data.y_train,
-        batch_size=1,
+        batch_size=model.batch_size,
         epochs=model.epoch,
         validation_data=(data.x_val, data.y_val)
     )
+
+    plot_model(history)
 
     loss, mae = model.evaluate(data.x_test, data.y_test)
     print(loss, mae)
@@ -84,5 +97,3 @@ if __name__ == '__main__':
         data.reshape_x(data.single_x(0.75))
     )
     print(pred)
-
-    plot_model(history, validation=True, keys=['loss', 'mae'])

@@ -1,11 +1,11 @@
 import numpy as np
 from random import randrange
-from tensorflow import keras
+from tensorflow.keras import activations, losses, metrics, optimizers
+from tensorflow.keras import Sequential
 from tensorflow.keras.layers import LSTM, Dense
-from typing import List
+from typing import Any, List
 
 from DataSet import DataSet
-from Model import Model
 from util import plot_model
 
 
@@ -16,6 +16,9 @@ class CategoricalPWM(DataSet):
         if not ratio:
             ratio = [0, 0.25, 0.5, 0.75, 1]
         super().__init__(ratio, period * cycle, len(ratio))
+
+    def _get_raw_data(self) -> Any:
+        return None
 
     def single_x(self, factor):
         data = []
@@ -39,18 +42,34 @@ class CategoricalPWM(DataSet):
         return np.eye(len(self.factors), dtype=np.float32)[y]
 
 
-class CategoricalLSTM(Model):
-    def __init__(self, data_set: DataSet, epoch: int, learning_rate: float, lstm_size: int):
-        super().__init__(data_set, epoch, learning_rate)
-        self.lstm_size = lstm_size
+class CategoricalLSTM(Sequential):
+    def __init__(
+            self,
+            input_size: int, output_size: int,
+            epoch: int, batch_size,
+            learning_rate: float, lstm_size: int
+    ):
+        super(CategoricalLSTM, self).__init__()
+        self.input_size: int = input_size
+        self.output_size: int = output_size
+        self.epoch: int = epoch
+        self.batch_size: int = batch_size
+        self.learning_rate: float = learning_rate
+        self.lstm_size: int = lstm_size
 
     def build_model(self):
         self.add(LSTM(self.lstm_size))
-        self.add(Dense(self.data_set.output_size, activation=keras.activations.softmax))
+        self.add(Dense(self.output_size, activation=activations.softmax))
+        self.compile(
+            loss=losses.CategoricalCrossentropy(),
+            optimizer=optimizers.RMSprop(self.learning_rate),
+            metrics=[
+                metrics.categorical_accuracy,
+                metrics.mean_squared_error
+            ]
+        )
 
-        self.compile(loss=keras.losses.CategoricalCrossentropy(),
-                     optimizer=keras.optimizers.RMSprop(self.learning_rate),
-                     metrics=['mse', 'accuracy'])
+        return self
 
 
 if __name__ == '__main__':
@@ -64,8 +83,10 @@ if __name__ == '__main__':
     )
 
     model = CategoricalLSTM(
-        data_set=data,
+        input_size=data.input_size,
+        output_size=data.output_size,
         epoch=5,
+        batch_size=1,
         learning_rate=0.01,
         lstm_size=50
     )
@@ -73,17 +94,17 @@ if __name__ == '__main__':
 
     history = model.fit(
         data.x_train, data.y_train,
-        batch_size=1,
+        batch_size=model.batch_size,
         epochs=model.epoch,
         validation_data=(data.x_val, data.y_val)
     )
 
-    loss, mse, accuracy = model.evaluate(data.x_test, data.y_test)
-    print(loss, mse, accuracy)
+    plot_model(history)
+
+    loss, accuracy, mse = model.evaluate(data.x_test, data.y_test)
+    print(loss, accuracy, mse)
 
     pred = model.predict(
         data.reshape_x(data.single_x(0.75))
     )
     print(pred)
-
-    plot_model(history, validation=True, keys=['loss', 'mse', 'accuracy'])

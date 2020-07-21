@@ -10,7 +10,11 @@ from util import plot_model
 
 
 class RegressionPWM(DataSet):
-    def __init__(self, ratio: List[float] = None, period: int = 20, cycle: int = 5):
+    def __init__(
+            self,
+            ratio: List[float] = None,
+            period: int = 20, cycle: int = 5
+    ):
         self.period = period
         self.cycle = cycle
         if ratio is None:
@@ -26,9 +30,9 @@ class RegressionPWM(DataSet):
         for i in range(self.cycle):
             for j in range(self.period):
                 if j < factor * self.period:
-                    data.append((800+randrange(200))/scaling)
+                    data.append((800 + randrange(200)) / scaling)
                 else:
-                    data.append(randrange(200)/scaling)
+                    data.append(randrange(200) / scaling)
 
         return data
 

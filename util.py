@@ -12,7 +12,7 @@ def split_data_set(x: List, y: List, ratio: List[float]):
         raise AssertionError('lists, `x` and `y`, are not the same length')
     if np.sum(ratio) > 1:
         raise AssertionError('The sum of the elements of the `ratio` must not exceed 1')
-    if any(r*len(x) < 1 for r in ratio):
+    if any(r * len(x) < 1 for r in ratio):
         warn('Too little ratio')
 
     error = int(np.around(np.log10(len(x)))) - 15
@@ -37,7 +37,7 @@ def plot_model(history: History):
                 keys.append((key1, key2))
                 break
         else:
-            keys.append(tuple(key1,))
+            keys.append(tuple(key1, ))
 
     fig, axes = plt.subplots(nrows=1, ncols=len(keys), sharex='all', figsize=(15, 6))
 

@@ -65,7 +65,7 @@ class DataSet(metaclass=ABCMeta):
             raise AttributeError('Nothing in the `ratio`')
 
         self.data_sets.clear()
-        data_sets = [[[], []] for _ in range(len(ratio)+1)]
+        data_sets = [[[], []] for _ in range(len(ratio) + 1)]
 
         for factor in self.factors:
             x = []

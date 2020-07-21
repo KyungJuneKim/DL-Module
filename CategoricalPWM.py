@@ -10,7 +10,11 @@ from util import plot_model
 
 
 class CategoricalPWM(DataSet):
-    def __init__(self, ratio: List[float] = None, period: int = 20, cycle: int = 5):
+    def __init__(
+            self,
+            ratio: List[float] = None,
+            period: int = 20, cycle: int = 5
+    ):
         self.period = period
         self.cycle = cycle
         if not ratio:

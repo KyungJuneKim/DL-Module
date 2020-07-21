@@ -1,7 +1,8 @@
+import matplotlib.pyplot as plt
 import numpy as np
 from abc import *
 from enum import Enum
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 from warnings import warn
 
 from util import split_data_set
@@ -18,10 +19,11 @@ class DataSet(metaclass=ABCMeta):
         test = 2
 
     def __init__(self, factors: List, input_size, output_size):
-        self.factors = factors
-        self.input_size = input_size
-        self.output_size = output_size
+        self.factors: Any = factors
+        self.input_size: int = input_size
+        self.output_size: int = output_size
 
+        self._raw: Any = self._get_raw_data()
         self.data_sets: List[Tuple[np.ndarray, np.ndarray]] = []
 
     def __get_property(self, io: IO, cat: Cat) -> Optional[np.ndarray]:
@@ -83,6 +85,15 @@ class DataSet(metaclass=ABCMeta):
             )
 
         return self
+
+    def plot_x(self, factor):
+        plt.plot(self.single_x(factor))
+        plt.tight_layout()
+        plt.show()
+
+    @abstractmethod
+    def _get_raw_data(self) -> Any:
+        pass
 
     @abstractmethod
     def single_x(self, factor):

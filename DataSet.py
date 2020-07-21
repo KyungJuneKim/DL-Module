@@ -23,7 +23,7 @@ class DataSet(metaclass=ABCMeta):
         self.input_size: int = input_size
         self.output_size: int = output_size
 
-        self._raw: Any = self._get_raw_data()
+        self._raw: Any = self._load_raw_data()
         self.data_sets: List[Tuple[np.ndarray, np.ndarray]] = []
 
     def __get_property(self, io: IO, cat: Cat) -> Optional[np.ndarray]:
@@ -92,7 +92,7 @@ class DataSet(metaclass=ABCMeta):
         plt.show()
 
     @abstractmethod
-    def _get_raw_data(self) -> Any:
+    def _load_raw_data(self) -> Any:
         pass
 
     @abstractmethod

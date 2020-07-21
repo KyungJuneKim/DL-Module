@@ -21,7 +21,7 @@ class CategoricalPWM(DataSet):
             ratio = [0, 0.25, 0.5, 0.75, 1]
         super().__init__(ratio, period * cycle, len(ratio))
 
-    def _get_raw_data(self) -> Any:
+    def _load_raw_data(self) -> Any:
         return None
 
     def single_x(self, factor):

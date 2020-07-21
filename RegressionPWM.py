@@ -21,7 +21,7 @@ class RegressionPWM(DataSet):
             ratio = np.arange(0., 1., 0.01).tolist()
         super().__init__(ratio, period * cycle, 1)
 
-    def _get_raw_data(self) -> Any:
+    def _load_raw_data(self) -> Any:
         return None
 
     def single_x(self, factor):

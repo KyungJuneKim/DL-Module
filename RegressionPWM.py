@@ -1,4 +1,6 @@
 import numpy as np
+from itertools import product
+from os import getcwd
 from random import randrange
 from tensorflow.keras import activations, losses, metrics, optimizers
 from tensorflow.keras import Sequential
@@ -12,14 +14,15 @@ from util import plot_model
 class RegressionPWM(DataSet):
     def __init__(
             self,
-            ratio: List[float] = None,
             period: int = 20, cycle: int = 5
     ):
-        self.period = period
-        self.cycle = cycle
-        if ratio is None:
-            ratio = np.arange(0., 1., 0.01).tolist()
-        super().__init__(ratio, period * cycle, 1)
+        self.period: int = period
+        self.cycle: int = cycle
+
+        duration = np.arange(0., 1., 0.05).tolist()
+        phase = range(period)
+        factors = list(product(duration, phase))
+        super().__init__(factors, period * cycle, 1)
 
     def _load_raw_data(self) -> Any:
         return None
@@ -29,7 +32,7 @@ class RegressionPWM(DataSet):
         scaling = 1000
         for i in range(self.cycle):
             for j in range(self.period):
-                if j < factor * self.period:
+                if (j + factor[1]) % self.period < factor[0] * self.period:
                     data.append((800 + randrange(200)) / scaling)
                 else:
                     data.append(randrange(200) / scaling)
@@ -37,7 +40,7 @@ class RegressionPWM(DataSet):
         return data
 
     def single_y(self, factor):
-        return factor
+        return factor[0]
 
     def reshape_x(self, x) -> np.ndarray:
         return np.array(x, dtype=np.float32).reshape((-1, self.input_size, 1))
@@ -78,11 +81,13 @@ if __name__ == '__main__':
         ratio=[0.7, 0.2]
     )
 
+    data.plot_x((0.75, 5))
+
     model = RegressionLSTM(
         epoch=5,
         batch_size=1,
         learning_rate=0.01,
-        lstm_size=50
+        lstm_size=5
     )
 
     history = model.fit(
@@ -94,10 +99,12 @@ if __name__ == '__main__':
 
     plot_model(history)
 
+    model.save(getcwd() + '/RegressionPWM')
+
     loss, mae = model.evaluate(data.x_test, data.y_test)
     print(loss, mae)
 
     pred = model.predict(
-        data.reshape_x(data.single_x(0.75))
+        data.reshape_x(data.single_x((0.75, 5)))
     )
     print(pred)

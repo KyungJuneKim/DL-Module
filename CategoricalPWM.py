@@ -82,7 +82,7 @@ if __name__ == '__main__':
         period=20,
         cycle=5
     ).generate(
-        num=100,
+        num=200,
         ratio=[0.7, 0.2]
     )
 
@@ -92,7 +92,7 @@ if __name__ == '__main__':
         epoch=5,
         batch_size=1,
         learning_rate=0.01,
-        lstm_size=50
+        lstm_size=10
     )
     model.build_model()
 

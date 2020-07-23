@@ -19,7 +19,7 @@ class DataSet(metaclass=ABCMeta):
         test = 2
 
     def __init__(self, factors: List, input_size, output_size):
-        self.factors: Any = factors
+        self.factors: List = factors
         self.input_size: int = input_size
         self.output_size: int = output_size
 

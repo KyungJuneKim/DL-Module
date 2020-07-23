@@ -3,7 +3,7 @@ from random import randrange
 from tensorflow.keras import activations, losses, metrics, optimizers
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import LSTM, Dense
-from typing import Any, List
+from typing import Any
 
 from DataSet import DataSet
 from util import plot_model
@@ -56,12 +56,12 @@ class RegressionLSTM(Sequential):
         self.epoch: int = epoch
         self.batch_size: int = batch_size
         self.learning_rate: float = learning_rate
-        self.lstm_size = lstm_size
+        self.lstm_size: int = lstm_size
 
         self.add(LSTM(lstm_size))
         self.add(Dense(1, activation=activations.sigmoid))
         self.compile(
-            loss=losses.mean_squared_error(),
+            loss=losses.MeanSquaredError(),
             optimizer=optimizers.Adam(learning_rate),
             metrics=[
                 metrics.mean_absolute_error

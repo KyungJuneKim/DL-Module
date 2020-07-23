@@ -15,8 +15,8 @@ class CategoricalPWM(DataSet):
             ratio: List[float] = None,
             period: int = 20, cycle: int = 5
     ):
-        self.period = period
-        self.cycle = cycle
+        self.period: int = period
+        self.cycle: int = cycle
         if not ratio:
             ratio = [0, 0.25, 0.5, 0.75, 1]
         super().__init__(ratio, period * cycle, len(ratio))
